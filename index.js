@@ -5,7 +5,7 @@ const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 const { token } = require('./config.json');
 
 // Create a new client instance
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers] });
 
 client.commands = new Collection();
 
@@ -49,6 +49,15 @@ client.on(Events.InteractionCreate, async interaction => {
         console.error(error);
         await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
     }
+});
+
+// Listen for new members joining the server
+client.on(Events.GuildMemberAdd, member => {
+    const channel = member.guild.systemChannel; // You can change this to any specific channel
+    if (channel) {
+        channel.send(`Welcome <@${member.id}>! Your user ID is ${member.id}.`);
+    }
+    console.log(`New member joined: ${member.user.tag} (ID: ${member.id})`);
 });
 
 // Log in to Discord with your client's token
